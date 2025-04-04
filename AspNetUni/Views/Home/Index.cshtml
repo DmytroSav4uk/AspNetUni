@@ -5,17 +5,25 @@
     ViewData["Title"] = "Home Page";
 }
 
+<style>
+    
+    
+</style>
+
+
+
 <div class="text-center">
-    <h1 class="display-4">Welcome to Event Tickets Booking site</h1>
     <h2>Tickets</h2>
 
     <table class="table">
         <thead>
         <tr>
-            <th>Id</th>
             <th>Artist</th>
+            <th>Event</th>
             <th>Concert Date</th>
+            <th>Location</th>
             <th>Price</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -23,12 +31,7 @@
         {
             @foreach (var ticket in Model.Tickets)
             {
-                <tr>
-                    <td>@ticket.Id</td>
-                    <td>@ticket.Performer</td>
-                    <td>@ticket.EventDate.ToString("yyyy-MM-dd")</td>
-                    <td>@ticket.Price</td>
-                </tr>
+                <partial name="TicketSummary" model="ticket" />
             }
         }
         else
@@ -38,32 +41,32 @@
         </tbody>
     </table>
 
-     @* Pagination Controls *@
+    @* Pagination Controls *@
     <div style="margin-bottom: 10px">
         <div>
             <span>Items per page: </span>
-            <a href="@Url.Action("Index", new { page = 1, pageSize = 5 })" class="btn btn-link @(Model.PageSize == 5 ? "active" : "")">5</a>
-            <a href="@Url.Action("Index", new { page = 1, pageSize = 10 })" class="btn btn-link @(Model.PageSize == 10 ? "active" : "")">10</a>
-            <a href="@Url.Action("Index", new { page = 1, pageSize = 20 })" class="btn btn-link @(Model.PageSize == 20 ? "active" : "")">20</a>
+            <a href="@Url.Action("Index", new { page = 1, pageSize = 5, category = Model.SelectedCategory })" class="btn btn-link @(Model.PageSize == 5 ? "active" : "")">5</a>
+            <a href="@Url.Action("Index", new { page = 1, pageSize = 10, category = Model.SelectedCategory })" class="btn btn-link @(Model.PageSize == 10 ? "active" : "")">10</a>
+            <a href="@Url.Action("Index", new { page = 1, pageSize = 20, category = Model.SelectedCategory })" class="btn btn-link @(Model.PageSize == 20 ? "active" : "")">20</a>
         </div>
     </div>
-
 
     @* Pagination *@
     <div style="display: flex;justify-content: center;">
         <ul  class="pagination">
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { page = 1, pageSize = Model.PageSize })">First</a>
+                <a class="page-link" href="@Url.Action("Index", new { page = 1, pageSize = Model.PageSize, category = Model.SelectedCategory })">First</a>
             </li>
             <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize })">Previous</a>
+                <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage - 1, pageSize = Model.PageSize, category = Model.SelectedCategory })">Previous</a>
             </li>
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize })">Next</a>
+                <a class="page-link" href="@Url.Action("Index", new { page = Model.CurrentPage + 1, pageSize = Model.PageSize, category = Model.SelectedCategory })">Next</a>
             </li>
             <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, pageSize = Model.PageSize })">Last</a>
+                <a class="page-link" href="@Url.Action("Index", new { page = Model.TotalPages, pageSize = Model.PageSize, category = Model.SelectedCategory })">Last</a>
             </li>
         </ul>
     </div>
+
 </div>

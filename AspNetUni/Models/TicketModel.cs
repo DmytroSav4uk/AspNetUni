@@ -8,4 +8,6 @@ public class TicketModel
     public DateTime EventDate { get; set; }
     public decimal Price { get; set; }
     public string Location { get; set; }
+    
+    public string Category { get; set; }
 }

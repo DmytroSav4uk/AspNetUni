@@ -10,7 +10,8 @@ namespace AspNetUni.Services
         string GetDatabaseVersion();
         Task PopulateTicketsAsync();
         Task<List<TicketModel>> GetAllTicketsAsync();
-        
+        Task<List<string>> GetAllCategoriesAsync();
+
         
         Task<int> GetTicketCountAsync();  
         Task<List<TicketModel>> GetTicketsAsync(int page, int pageSize); 
@@ -83,12 +84,29 @@ namespace AspNetUni.Services
             }
         }
         
-        
-        
         public async Task<int> GetTicketCountAsync()
         {
             return await _context.Tickets.CountAsync();
         }
+        
+        public async Task<List<string>> GetAllCategoriesAsync()
+        {
+            try
+            {
+                return await _context.Tickets
+                    .Where(t => t.Category != null)
+                    .Select(t => t.Category)
+                    .Distinct()
+                    .OrderBy(c => c)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error retrieving categories: {ex.Message}");
+                return new List<string>();
+            }
+        }
+
 
         public async Task<List<TicketModel>> GetTicketsAsync(int page, int pageSize)
         {
@@ -97,11 +115,5 @@ namespace AspNetUni.Services
                 .Take(pageSize) 
                 .ToListAsync();  
         }
-
-        
-        
-        
-        
-        
     }
 }

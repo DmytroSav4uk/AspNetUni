@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Org.BouncyCastle.Asn1.Ocsp
+@model IEnumerable<string>
+
+<style>
+
+    .list-group-item {
+        transition: ease-in-out 0.3s;
+    }
+    
+    .list-group-item.active {
+        background-color: #007bff; 
+        color: white;
+    }
+</style>
+
+
+
+
+
+<div class="list-group">
+  
+    <a asp-action="Index" asp-controller="Home" asp-route-category=""
+       class="list-group-item list-group-item-action @(string.IsNullOrEmpty(ViewContext.HttpContext.Request.Query["category"]) ? "active" : "")">
+        All Categories
+    </a>
+
+    @foreach (var category in Model)
+    {
+        <a asp-action="Index" asp-controller="Home" asp-route-category="@category"
+           class="list-group-item list-group-item-action @(ViewContext.HttpContext.Request.Query["category"] == category ? "active" : "")">
+            @category
+        </a>
+    }
+</div>
+

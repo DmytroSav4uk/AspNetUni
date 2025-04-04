@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AspNetUni.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using AspNetUni.Models;
 using AspNetUni.Services;
@@ -16,49 +17,49 @@ public class HomeController : Controller
         _databaseService = databaseService;
     }
 
-    // public async Task<IActionResult> Index()
-    // {
-    //     // await _databaseService.PopulateTicketsAsync();
-    //     
-    //     
-    //     var tickets = await _databaseService.GetAllTicketsAsync();
-    //     // var version = _databaseService.GetDatabaseVersion();
-    //     // ViewBag.Version = version;
-    //     return View(tickets);
-    // }
-
-    
-    public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(string? category, int page = 1, int pageSize = 5)
     {
-       
-        var totalTickets = await _databaseService.GetTicketCountAsync();
-
-       
-        var tickets = await _databaseService.GetTicketsAsync(page, pageSize);
+        var allTickets = await _databaseService.GetAllTicketsAsync();
 
         
+        if (!string.IsNullOrEmpty(category))
+        {
+            allTickets = allTickets.Where(t => t.Category == category).ToList();
+        }
+
+        var totalTickets = allTickets.Count;
+
+        var paginatedTickets = allTickets
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
         var totalPages = (int)Math.Ceiling(totalTickets / (double)pageSize);
-        
+
         var viewModel = new TicketPaginationViewModel
         {
-            Tickets = tickets,
+            Tickets = paginatedTickets,
             CurrentPage = page,
             TotalPages = totalPages,
             PageSize = pageSize,
-            TotalTickets = totalTickets
+            TotalTickets = totalTickets,
+            SelectedCategory = category 
         };
 
         return View(viewModel);
     }
 
-    public IActionResult ChangeItemsPerPage(int pageSize)
+
+    public IActionResult ChangeItemsPerPage(int pageSize, string? category)
     {
-        return RedirectToAction("Index", new { page = 1, pageSize = pageSize });
+        return RedirectToAction("Index", new { page = 1, pageSize = pageSize, category });
     }
-    
-    public IActionResult Privacy()
+
+    public IActionResult Booked()
     {
-        return View();
+        var cart = HttpContext.Session.GetObjectFromJson<List<TicketModel>>("Cart") ?? new List<TicketModel>();
+        
+        return View(cart);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -66,4 +67,32 @@ public class HomeController : Controller
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+    
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> AddToCart(int ticketId)
+    {
+     
+        var tickets = await _databaseService.GetAllTicketsAsync();
+
+       
+        var selectedTicket = tickets.FirstOrDefault(t => t.Id == ticketId);
+
+        if (selectedTicket != null)
+        {
+        
+            var cart = HttpContext.Session.GetObjectFromJson<List<TicketModel>>("Cart") ?? new List<TicketModel>();
+
+        
+            cart.Add(selectedTicket);
+
+         
+            HttpContext.Session.SetObjectAsJson("Cart", cart);
+        }
+
+      
+        return RedirectToAction("Index");
+    }
+
 }

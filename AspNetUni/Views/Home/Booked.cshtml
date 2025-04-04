@@ -1,0 +1,29 @@
+﻿@model List<AspNetUni.Models.TicketModel>
+
+<h2>Your Cart</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Artist</th>
+        <th>Event</th>
+        <th>Concert Date</th>
+        <th>Location</th>
+        <th>Price</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ticket in Model)
+    {
+        <tr>
+            <td>@ticket.Performer</td>
+            <td>@ticket.Event</td>
+            <td>@ticket.EventDate.ToString("yyyy-MM-dd")</td>
+            <td>@ticket.Location</td>
+            <td>@ticket.Price</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Checkout")" class="btn btn-success">Proceed to Checkout</a>

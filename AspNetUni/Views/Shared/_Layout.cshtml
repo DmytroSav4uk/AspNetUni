@@ -23,15 +23,32 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
-                    @* <li class="nav-item"> *@
-                    @*     <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
-                    @* </li> *@
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Booked">Booked Tickets</a>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 </header>
 <div class="container">
+    <div class="row">
+        
+        @* render only on main page *@
+        
+        @if (ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Home")
+        {
+            <div class="col-3">
+                @await Component.InvokeAsync("NavigationMenu")
+            </div>
+        }
+        <div class="col-9">
+            @RenderBody()
+        </div>
+    </div>
+
+    
+    
     <main role="main" class="pb-3">
         @RenderBody()
     </main>

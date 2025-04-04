@@ -7,4 +7,7 @@ public class TicketPaginationViewModel
     public int TotalPages { get; set; }
     public int PageSize { get; set; }
     public int TotalTickets { get; set; }
+    
+    public string? SelectedCategory { get; set; }
+
 }
