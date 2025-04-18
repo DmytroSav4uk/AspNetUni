@@ -8,5 +8,8 @@ namespace AspNetUni.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         public DbSet<TicketModel> Tickets { get; set; }
+        public DbSet<CategoryModel> Categories { get; set; }
+        
+        
     }
 }

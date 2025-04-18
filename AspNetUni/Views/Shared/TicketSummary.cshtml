@@ -6,10 +6,28 @@
     <td>@Model.EventDate.ToString("dd-MM-yyyy")</td>
     <td>@Model.Location</td>
     <td>@Model.Price</td>
+    <td>@Model.Category?.Name</td>
     <td>
-        <form method="post" asp-action="AddToCart" asp-controller="Home">
-            <input type="hidden" name="ticketId" value="@Model.Id" />
-            <button type="submit" class="btn btn-primary">Book a Ticket</button>
-        </form>
+        <button class="btn btn-primary" onclick="addToCart(@Model.Id)">Book a Ticket</button>
     </td>
 </tr>
+
+
+<script type="text/javascript">
+    function addToCart(ticketId) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AddToCart", "Home")',
+            data: {ticketId: ticketId},
+            success: function (response) {
+
+                window.location.reload();
+            },
+            error: function (xhr, status, error) {
+                alert('An error occurred while adding the ticket to the cart.');
+            }
+        });
+
+        return false;
+    }
+</script>

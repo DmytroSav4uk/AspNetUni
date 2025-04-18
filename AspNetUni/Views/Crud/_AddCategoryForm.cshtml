@@ -1,0 +1,11 @@
+﻿@model AspNetUni.Models.CrudViewModel
+
+<div id="addCategoryForm" style="display:none" class="mb-4">
+    <form asp-action="AddCategory" method="post">
+        <div class="form-group">
+            <label>Category Name</label>
+            <input name="Name" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Save</button>
+    </form>
+</div>

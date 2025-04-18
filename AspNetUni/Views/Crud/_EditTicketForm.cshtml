@@ -1,0 +1,37 @@
+﻿@model AspNetUni.Models.CrudViewModel
+
+<div id="editForm" style="display:none;" class="mb-4">
+    <form asp-action="EditTicket" method="post">
+        <input type="hidden" name="Id" id="editId" />
+        <div class="form-group">
+            <label>Performer</label>
+            <input name="Performer" id="editPerformer" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Event</label>
+            <input name="Event" id="editEvent" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" name="EventDate" id="editEventDate" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Location</label>
+            <input name="Location" id="editLocation" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="number" step="0.01" name="Price" id="editPrice" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Category</label>
+            <select name="CategoryId" id="editCategory" class="form-control">
+                @foreach (var category in Model.Categories ?? new List<AspNetUni.Models.CategoryModel>())
+                {
+                    <option value="@category.Id">@category.Name</option>
+                }
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Update</button>
+    </form>
+</div>

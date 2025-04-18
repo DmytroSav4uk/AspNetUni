@@ -1,0 +1,12 @@
+﻿@model AspNetUni.Models.CrudViewModel
+
+<div id="editCategoryForm" style="display:none" class="mb-4">
+    <form asp-action="EditCategory" method="post">
+        <input type="hidden" name="Id" id="editCategoryId" />
+        <div class="form-group">
+            <label>Category Name</label>
+            <input name="Name" id="editCategoryName" class="form-control" required />
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Update</button>
+    </form>
+</div>
