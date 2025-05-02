@@ -1,8 +1,9 @@
-﻿using AspNetUni.Models;
-using AspNetUni.Data;
+﻿using ClassLibraryUni.Models;
+using ClassLibraryUni.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace AspNetUni.Services
+namespace ClassLibraryUni.Services
 {
     public interface IDatabaseService
     {
@@ -35,6 +36,8 @@ namespace AspNetUni.Services
         private readonly ApplicationDbContext _context;
         private readonly ILogger<DatabaseService> _logger;
 
+        
+        
         public DatabaseService(ApplicationDbContext context, ILogger<DatabaseService> logger)
         {
             _context = context;
@@ -253,6 +256,12 @@ namespace AspNetUni.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        
+        
+        
+        
+        
         
     }
 }

@@ -82,8 +82,6 @@ namespace AspNetUni.Controllers
             await _databaseService.DeleteCategoryAsync(id);
             return RedirectToAction("Crud", new { view = "categories" });
         }
-
-        
         
     }
 }
