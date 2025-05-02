@@ -1,7 +1,8 @@
 using AspNetUni.Services;
 using AspNetUni.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,24 +22,33 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("AivenMySql"))
 );
 
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
+
 builder.Services.AddScoped<IDatabaseService, DatabaseService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 app.UseRouting();
 
+app.UseAuthentication(); 
 app.UseAuthorization();
 app.UseSession();
 app.MapStaticAssets();
+app.MapRazorPages();
 
 app.MapControllerRoute(
         name: "default",

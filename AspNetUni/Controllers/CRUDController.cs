@@ -1,9 +1,11 @@
 ﻿using AspNetUni.Models;
 using AspNetUni.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetUni.Controllers
 {
+    [Authorize]
     public class CrudController : Controller
     {
         private readonly IDatabaseService _databaseService;

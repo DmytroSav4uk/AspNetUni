@@ -14,17 +14,29 @@ namespace WebApiUni.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
 
-        public AuthController(UserManager<ApplicationUser> userManager, IConfiguration configuration)
+       
+        public AuthController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
         {
             _userManager = userManager;
+            _roleManager = roleManager;  
             _configuration = configuration;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
+           
+            var roleExist = await _roleManager.RoleExistsAsync(model.Role);
+            if (!roleExist)
+            {
+              
+                var role = new IdentityRole(model.Role);
+                await _roleManager.CreateAsync(role);
+            }
+            
             var user = new ApplicationUser
             {
                 UserName = model.Username,
@@ -34,7 +46,11 @@ namespace WebApiUni.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
-                return Ok("User created successfully");
+            {
+                await _userManager.AddToRoleAsync(user, model.Role);
+
+                return Ok("User created successfully and assigned to role.");
+            }
 
             return BadRequest(result.Errors);
         }
