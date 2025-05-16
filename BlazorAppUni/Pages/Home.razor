@@ -1,0 +1,106 @@
+﻿@page "/"
+@inject Services.AuthService AuthService
+
+<PageTitle>Home</PageTitle>
+
+@if (AuthService.IsAuthenticated)
+{
+    <h1>Hello, @AuthService.Username!</h1>
+    <button class="btn btn-secondary" @onclick="Logout">Logout</button>
+}
+else
+{
+    <h3>Login</h3>
+
+    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <InputText @bind-Value="loginModel.Username" placeholder="Username" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <InputText @bind-Value="loginModel.Password" type="password" placeholder="Password" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(loginError))
+    {
+        <p class="text-danger">@loginError</p>
+    }
+
+    <hr />
+
+    <h3>Register</h3>
+    <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="mb-2">
+            <InputText @bind-Value="registerModel.Username" placeholder="Username" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <InputText @bind-Value="registerModel.Email" type="email" placeholder="Email" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <InputText @bind-Value="registerModel.Password" type="password" placeholder="Password" class="form-control" />
+        </div>
+        <div class="mb-2">
+            <InputText @bind-Value="registerModel.Role" placeholder="Role" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-success">Register</button>
+    </EditForm>
+
+    @if (!string.IsNullOrEmpty(registerError))
+    {
+        <p class="text-danger">@registerError</p>
+    }
+}
+@code {
+    private LoginModel loginModel = new();
+    private RegisterModel registerModel = new();
+    private string? loginError;
+    private string? registerError;
+
+    private async Task HandleLogin()
+    {
+        loginError = null;
+        var success = await AuthService.LoginAsync(loginModel.Username, loginModel.Password);
+        if (!success)
+        {
+            loginError = "Invalid username or password.";
+        }
+    }
+
+    private async Task HandleRegister()
+    {
+        registerError = null;
+        var success = await AuthService.RegisterAsync(registerModel.Username, registerModel.Email, registerModel.Password, registerModel.Role);
+        if (!success)
+        {
+            registerError = "Registration failed. Try again.";
+        }
+        else
+        {
+            registerModel = new RegisterModel();
+        }
+    }
+
+    private void Logout()
+    {
+        AuthService.Logout();
+    }
+
+    public class LoginModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class RegisterModel
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string Role { get; set; } = "User"; 
+    }
+}

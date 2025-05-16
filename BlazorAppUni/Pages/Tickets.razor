@@ -1,0 +1,193 @@
+﻿@page "/tickets"
+@using BlazorAppUni.Services
+
+@inject ApiService ApiService
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+
+
+<h3>Tickets</h3>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>Performer</th>
+        <th>Event</th>
+        <th>Date</th>
+        <th>Location</th>
+        <th>Price</th>
+        <th>Category</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ticket in TicketList)
+    {
+        <tr>
+            <td>@ticket.Performer</td>
+            <td>@ticket.Event</td>
+            <td>@ticket.EventDate.ToShortDateString()</td>
+            <td>@ticket.Location</td>
+            <td>@ticket.Price</td>
+            <td>@ticket.Category?.Name</td>
+            <td>
+                <button class="btn btn-warning btn-sm" @onclick="@(() => EditTicket(ticket))">Edit</button>
+                <button class="btn btn-danger btn-sm" @onclick="@(() => DeleteTicket(ticket.Id))">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h4>@(CurrentTicket.Id == 0 ? "Add Ticket" : "Edit Ticket")</h4>
+
+<EditForm Model="CurrentTicket" OnValidSubmit="SaveTicket">
+    <DataAnnotationsValidator />
+    <div class="mb-2"><InputText class="form-control" @bind-Value="CurrentTicket.Performer" placeholder="Performer" /></div>
+    <div class="mb-2"><InputText class="form-control" @bind-Value="CurrentTicket.Event" placeholder="Event" /></div>
+    <div class="mb-2"><InputDate class="form-control" @bind-Value="CurrentTicket.EventDate" /></div>
+    <div class="mb-2"><InputText class="form-control" @bind-Value="CurrentTicket.Location" placeholder="Location" /></div>
+    <div class="mb-2"><InputNumber class="form-control" @bind-Value="CurrentTicket.Price" placeholder="Price" /></div>
+    <div class="mb-2">
+        <InputSelect class="form-control" @bind-Value="CurrentTicket.CategoryId">
+            <option value="">-- Select Category --</option>
+            @foreach (var category in Categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <button class="btn btn-success" type="submit">Save</button>
+    <button class="btn btn-secondary ms-2" @onclick="ResetTicketForm">Clear</button>
+</EditForm>
+
+<hr />
+
+<h3>Categories</h3>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var category in Categories)
+    {
+        <tr>
+            <td>@category.Name</td>
+            <td>
+                <button class="btn btn-warning btn-sm" @onclick="@(() => EditCategory(category))">Edit</button>
+                <button class="btn btn-danger btn-sm" @onclick="@(() => DeleteCategory(category.Id))">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h4>@(CategoryModel.Id == 0 ? "Add Category" : "Edit Category")</h4>
+
+<EditForm Model="CategoryModel" OnValidSubmit="SaveCategory">
+    <DataAnnotationsValidator />
+    <div class="mb-2"><InputText class="form-control" @bind-Value="CategoryModel.Name" placeholder="Category Name" /></div>
+    <button class="btn btn-success" type="submit">Save</button>
+    <button class="btn btn-secondary ms-2" @onclick="ResetCategoryForm">Clear</button>
+</EditForm>
+
+
+@code {
+    private List<TicketModel> TicketList = new();
+    private List<CategoryModel> Categories = new();
+
+    private TicketModel CurrentTicket = new();
+    private CategoryModel CategoryModel = new();
+
+    private bool isAuthorized;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        
+        isAuthorized = AuthService.IsAuthenticated;
+        if (!isAuthorized)
+        {
+            Navigation.NavigateTo("/");
+            return;
+        }
+        
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        TicketList = await ApiService.GetAllTicketsAsync();
+        Categories = await ApiService.GetAllCategoriesAsync();
+    }
+
+    private async Task SaveTicket()
+    {
+        if (CurrentTicket.Id == 0)
+            await ApiService.AddTicketAsync(CurrentTicket);
+        else
+            await ApiService.UpdateTicketAsync(CurrentTicket);
+
+        ResetTicketForm();
+        await LoadData();
+    }
+
+    private void EditTicket(TicketModel ticket)
+    {
+        CurrentTicket = new TicketModel
+        {
+            Id = ticket.Id,
+            Performer = ticket.Performer,
+            Event = ticket.Event,
+            EventDate = ticket.EventDate,
+            Location = ticket.Location,
+            Price = ticket.Price,
+            CategoryId = ticket.CategoryId
+        };
+    }
+
+    private async Task DeleteTicket(int id)
+    {
+        await ApiService.DeleteTicketAsync(id);
+        await LoadData();
+    }
+
+    private void ResetTicketForm()
+    {
+        CurrentTicket = new TicketModel();
+    }
+
+    private async Task SaveCategory()
+    {
+        if (CategoryModel.Id == 0)
+            await ApiService.AddCategoryAsync(CategoryModel);
+        else
+            await ApiService.UpdateCategoryAsync(CategoryModel);
+
+        ResetCategoryForm();
+        await LoadData();
+    }
+
+    private void EditCategory(CategoryModel category)
+    {
+        CategoryModel = new CategoryModel
+        {
+            Id = category.Id,
+            Name = category.Name
+        };
+    }
+
+    private async Task DeleteCategory(int id)
+    {
+        await ApiService.DeleteCategoryAsync(id);
+        await LoadData();
+    }
+
+    private void ResetCategoryForm()
+    {
+        CategoryModel = new CategoryModel();
+    }
+}
